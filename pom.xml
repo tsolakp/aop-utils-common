@@ -6,7 +6,7 @@
     <artifactId>aop-utils-common</artifactId>
     <packaging>jar</packaging>
     <version>1.0.0.0-SNAPSHOT</version>
-    <name>Common AOP and Proxy based utility classes.</name>
+    <name>Common AOP utility classes.</name>
 
     <properties>
         <spring-version>3.0.1.RELEASE</spring-version>
