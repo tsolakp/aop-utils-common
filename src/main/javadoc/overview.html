@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>API Overview</TITLE>
+</HEAD>
+<BODY>
+
+<p>Usually MethodInterceptors are used with Spring's org.springframework.aop.framework.ProxyFactoryBean or 
+org.springframework.aop.framework.ProxyFactoryBean.</p>
+
+<h2>Here is sample setup using org.springframework.aop.framework.ProxyFactoryBean</h2>
+
+<p>Lest say we have EventHandler interface that we want to proxy and return some pre defined value for "getName"
+method (since composite calls to it might not make sense) and do composite implementation for "handleEvent" 
+that will delegate to object that will implement EventHandler type.</p>   
+
+<pre>
+{@code
+ 
+ private static interface EventHandler {
+		
+     public String getName();		
+				
+     public void handleEvent(String event);
+ } 
+   
+   
+ public static void main(String[] args){  
+     EventHandler delegate1 = new ConcreateEventHandler();
+     EventHandler delegate2 = new ConcreateEventHandler();
+						    
+     org.equilibriums.aop.utils.interceptor.delegate.DelegateInterceptor delegateInterceptor = 
+     new org.equilibriums.aop.utils.interceptor.delegate.DelegateInterceptor();
+     delegateInterceptor.setDelegates( Arrays.<Object>asList( delegate1, delegate2 ) );
+				
+     org.springframework.aop.framework.ProxyFactory factory = new org.springframework.aop.framework.ProxyFactory( 
+     new Class[]{EventHandler.class} );
+     //use this as placeholder for real target that implements EventHandler.		
+     factory.setTargetSource( org.springframework.aop.target.EmptyTargetSource.INSTANCE );
+		
+     org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor getNameStubInterceptor = 
+     new org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor();		
+     getNameStubInterceptor.setReturnValue( "Proxy Name" );
+				
+     org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor nullStubInterceptor = 
+     new org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor();		
+     nullStubInterceptor.setReturnValue(null);
+				
+     org.springframework.aop.support.NameMatchMethodPointcut nameMatchMethodPointcut1 = new org.springframework.aop.support.NameMatchMethodPointcut();	
+     nameMatchMethodPointcut1.setMappedName( "getName" );		
+     factory.addAdvisor(  new org.springframework.aop.support.DefaultPointcutAdvisor( nameMatchMethodPointcut1, getNameStubInterceptor ) );
+		
+     org.springframework.aop.support.NameMatchMethodPointcut nameMatchMethodPointcut2 = new org.springframework.aop.support.NameMatchMethodPointcut();	
+     nameMatchMethodPointcut2.setMappedName( "handleEvent" );		
+     factory.addAdvisor(  new org.springframework.aop.support.DefaultPointcutAdvisor( nameMatchMethodPointcut2, delegateInterceptor ) );
+     //since we are proxying an interface and DelegateInterceptor calls "proceed" we need to add nullStubInterceptor as last interceptor for "handleEvent" method
+     //so that we wont get NullPointerExcepton 
+     factory.addAdvisor(  new org.springframework.aop.support.DefaultPointcutAdvisor( nameMatchMethodPointcut2, nullStubInterceptor ) );
+		
+     EventHandler eventHandlerTarget = (EventHandler)factory.getProxy();
+	    
+     String name = eventHandlerTarget.getName(); //should return "Proxy Name"
+     eventHandlerTarget.handleEvent( "event1" ); //should call delegate1 and delegate2 "handleEvent" methods with "event1" argument
+ }
+}
+</pre>
+
+<h2>Same can be done with the following Spring XML configuration.</h2>
+
+<pre>
+{@code
+
+  <bean id="delegate1" class="ConcreateEventHandler"/>
+  <bean id="delegate2" class="ConcreateEventHandler"/>
+ 
+  <bean id="factory" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="interfaces"><list><value>EventHandler</value></list></property>
+      <property name="targetSource">
+          <util:constant static-field="org.springframework.aop.target.EmptyTargetSource.INSTANCE" />
+      </property>
+      <property name="interceptorNames">
+          <list>
+              <value>interceptor1</value>
+              <value>interceptor2</value>
+              <value>interceptor3</value>
+          </list>
+      </property>
+  </bean>
+  
+  <bean id="interceptor1" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+      <property name="pointcut">
+          <bean class="org.springframework.aop.support.NameMatchMethodPointcut">
+              <property name="mappedName" value="getName" />
+          </bean>
+      </property>
+      <property name="advice">
+          <bean	class="org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor">
+              <property name="returnValue" value="Proxy Name"/>
+          </bean>
+      </property>
+  </bean>
+  
+  <bean id="interceptor2" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+      <property name="pointcut">
+          <bean class="org.springframework.aop.support.NameMatchMethodPointcut">
+              <property name="mappedName" value="handleEvent" />
+          </bean>
+      </property>
+      <property name="advice">
+          <bean	class="org.equilibriums.aop.utils.interceptor.delegate.DelegateInterceptor">
+              <property name="delegates">
+                  <list>
+                      <ref bean="delegate1"/>
+                      <ref bean="delegate2"/>
+                  </list>
+              </property>
+          </bean>
+      </property>
+  </bean>
+  
+  <bean id="interceptor3" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+      <property name="pointcut">
+          <bean class="org.springframework.aop.support.NameMatchMethodPointcut">
+              <property name="mappedName" value="handleEvent" />
+          </bean>
+      </property>
+      <property name="advice">
+          <bean	class="org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor">
+              <property name="returnValue"><null/></property>
+          </bean>
+      </property>
+  </bean>
+}
+</pre>
+  
+</BODY>
+</HTML>
