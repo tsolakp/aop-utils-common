@@ -1,5 +1,4 @@
-/* Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
- *
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +21,29 @@ import org.aopalliance.intercept.MethodInterceptor;
 /**
  * <p>
  * Will intercept a method call and follow rules defined below without calling
- * target method.
+ * target method (wont call invocation.proceed() ).
  * </p>
+ * <p>
+ * <ul>
+ * <li>
+ * 1. Given method "void method1(...)", will do nothing no matter what
+ * returnValue is set to.</li>
+ * <li>
+ * 2. Given method "String method2(...)" and returnValue is set to
+ * "Hello World", will return "Hellow World" no matter what checkReturnValueType
+ * is set to.</li>
+ * <li>
+ * 3. Given method "String method3(...)" and returnValue is set to "new Object",
+ * will throw IllegalStateException if checkReturnValueType is true otherwise
+ * will return "new Object".</li>
+ * <li>
+ * 4. Given method "Object method4(...)" and returnValue is set to
+ * "Hello World", will return "Hellow World" no matter what checkReturnValueType
+ * is set to.</li>
+ * </ul>
+ * </p>
+ * 
+ * <p><u>For more on how to use this interceptor see Overview section of this Javadoc.</u></p>
  * 
  * @author Tsolak Petrosian
  * 

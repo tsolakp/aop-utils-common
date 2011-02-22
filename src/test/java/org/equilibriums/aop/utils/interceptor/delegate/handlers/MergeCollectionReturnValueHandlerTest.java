@@ -1,3 +1,16 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.equilibriums.aop.utils.interceptor.delegate.handlers;
 
 import java.util.Map;
@@ -21,76 +34,41 @@ public class MergeCollectionReturnValueHandlerTest {
 	
 	@Test
 	public void testSupports_ObjectReturnType(){
-		assertFalse( mergeCollectionReturnValueHandler.supports( Object.class, null, null ) );
+		assertFalse( mergeCollectionReturnValueHandler.supports( Object.class, null ) );
 	}
 	
 	@Test
 	public void testSupports_CollectionReturnType(){
-		assertTrue( mergeCollectionReturnValueHandler.supports( Collection.class, null, null ) );
+		assertTrue( mergeCollectionReturnValueHandler.supports( Collection.class, null ) );
 	}
 	
 	@Test
 	public void testSupports_ArrayListReturnType(){
-		assertTrue( mergeCollectionReturnValueHandler.supports( ArrayList.class, null, null ) );
+		assertTrue( mergeCollectionReturnValueHandler.supports( ArrayList.class, null ) );
 	}
 	
 	@Test
 	public void testSupports_MapReturnType(){
-		assertFalse( mergeCollectionReturnValueHandler.supports( Map.class, null, null ) );
+		assertFalse( mergeCollectionReturnValueHandler.supports( Map.class, null ) );
 	}
 	
     @Test
 	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_SingleEmptyListReturnValue_NullProceededReturnValue(){
+	public void testGetReturnValue_SingleEmptyListReturnValue(){
 		List<Object> returnValues = new ArrayList<Object>();
 		
 		List<Object> o1 = new ArrayList<Object>();
 		returnValues.add( o1 );
 		
-		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, null );
+		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
 		assertEquals( result.size(), 0 );
 	}
     
-    @Test
-	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_SingleEmptyListReturnValue_EmptyProceededListReturnValue(){
-    	mergeCollectionReturnValueHandler.setCollectionClass( HashSet.class );
-    	List<Object> returnValues = new ArrayList<Object>();
-		
-		List<Object> o1 = new ArrayList<Object>();
-		returnValues.add( o1 );
-		
-		List<Object> proceededReturnValue = new ArrayList<Object>();
-		
-		HashSet<Object> result = ( HashSet<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, proceededReturnValue );
-		
-		assertEquals( result.size(), 0 );
-	}
     
     @Test
 	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_SingleEmptyListReturnValue_PopulatedProceededListReturnValue(){
-    	mergeCollectionReturnValueHandler.setCollectionClass( HashSet.class );
-    	List<Object> returnValues = new ArrayList<Object>();
-		
-		List<Object> o1 = new ArrayList<Object>();
-		returnValues.add( o1 );
-		
-		List<Object> proceededReturnValue = new ArrayList<Object>();
-		Object proceededReturnValue1 = new Object();
-		proceededReturnValue.add( proceededReturnValue1 );
-		
-		HashSet<Object> result = ( HashSet<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, proceededReturnValue );
-		
-		assertEquals( result.size(), 1 );
-		assertTrue( result.contains( proceededReturnValue1 ) );
-	}
-    
-    
-    @Test
-	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_SinglePopulatedListReturnValue_NullProceededReturnValue(){
+	public void testGetReturnValue_SinglePopulatedListReturnValue(){
     	mergeCollectionReturnValueHandler.setCollectionClass( HashSet.class );
     	
 		List<Object> returnValues = new ArrayList<Object>();
@@ -100,55 +78,15 @@ public class MergeCollectionReturnValueHandlerTest {
 		o1.add( o11 );
 		returnValues.add( o1 );
 		
-		HashSet<Object> result = ( HashSet<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, null );
+		HashSet<Object> result = ( HashSet<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
 		assertEquals( result.size(), 1 );
 		assertTrue( result.contains( o11 ) );
-	}
+	}    
     
     @Test
 	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_SinglePopulatedListReturnValue_EmptyProceededListReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
-		
-		List<Object> o1 = new ArrayList<Object>();
-		Object o11 = new Object();
-		o1.add( o11 );
-		returnValues.add( o1 );
-		
-		List<Object> proceededReturnValue = new ArrayList<Object>();
-		
-		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, proceededReturnValue );
-		
-		assertEquals( result.size(), 1 );
-		assertTrue( result.contains( o11 ) );;
-	}
-    
-    @Test
-	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_SinglePopulatedListReturnValue_PopulatedProceededListReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
-		
-		List<Object> o1 = new ArrayList<Object>();
-		Object o11 = new Object();
-		o1.add( o11 );
-		returnValues.add( o1 );
-		
-		List<Object> proceededReturnValue = new ArrayList<Object>();
-		Object proceededReturnValue1 = new Object();
-		proceededReturnValue.add( proceededReturnValue1 );
-		
-		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, proceededReturnValue );
-		
-		assertEquals( result.size(), 2 );
-		assertTrue( result.contains( o11 ) );
-		assertTrue( result.contains( proceededReturnValue1 ) );
-	}
-    
-    
-    @Test
-	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_2EmptyListReturnValue_NullProceededReturnValue(){
+	public void testGetReturnValue_2EmptyListReturnValue(){
 		List<Object> returnValues = new ArrayList<Object>();
 		
 		List<Object> o1 = new ArrayList<Object>();
@@ -157,57 +95,15 @@ public class MergeCollectionReturnValueHandlerTest {
 		List<Object> o2 = new ArrayList<Object>();
 		returnValues.add( o2 );
 		
-		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, null );
+		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
 		assertEquals( result.size(), 0 );
 	}
     
+        
     @Test
 	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_2EmptyListReturnValue_EmptyProceededListReturnValue(){
-    	mergeCollectionReturnValueHandler.setCollectionClass( HashSet.class );
-    	List<Object> returnValues = new ArrayList<Object>();
-		
-		List<Object> o1 = new ArrayList<Object>();
-		returnValues.add( o1 );
-		
-		List<Object> o2 = new ArrayList<Object>();
-		returnValues.add( o2 );
-		
-		List<Object> proceededReturnValue = new ArrayList<Object>();
-		
-		HashSet<Object> result = ( HashSet<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, proceededReturnValue );
-		
-		assertEquals( result.size(), 0 );
-	}
-    
-    @Test
-	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_2EmptyListReturnValue__null_PoulatedProceededListReturnValue(){
-    	List<Object> returnValues = new ArrayList<Object>();
-		
-		List<Object> o1 = new ArrayList<Object>();
-		returnValues.add( o1 );
-		
-		List<Object> o2 = new ArrayList<Object>();
-		returnValues.add( o2 );
-		
-		returnValues.add(null);
-		
-		List<Object> proceededReturnValue = new ArrayList<Object>();
-		Object proceededReturnValue1 = new Object();
-		proceededReturnValue.add( proceededReturnValue1 );
-		
-		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, proceededReturnValue );
-		
-		assertEquals( result.size(), 1 );
-		assertEquals( result.get(0), proceededReturnValue1 );
-	}
-    
-    
-    @Test
-	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_2PopulatedListReturnValue_NullProceededReturnValue(){
+	public void testGetReturnValue_2PopulatedListReturnValue(){
 		List<Object> returnValues = new ArrayList<Object>();
 		
 		List<Object> o1 = new ArrayList<Object>();
@@ -223,64 +119,10 @@ public class MergeCollectionReturnValueHandlerTest {
 		List<Object> o3 = new ArrayList<Object>();
 		returnValues.add( o3 );
 		
-		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, null );
+		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
 		assertEquals( result.size(), 2 );
 		assertEquals( result.get(0), o11 );
 		assertEquals( result.get(1), o22 );
-	}
-    
-    @Test
-	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_2PopulatedListReturnValue_EmptyProceededListReturnValue(){
-    	mergeCollectionReturnValueHandler.setCollectionClass( HashSet.class );
-    	List<Object> returnValues = new ArrayList<Object>();
-		
-		List<Object> o1 = new ArrayList<Object>();
-		Object o11 = new Object();
-		o1.add( o11 );
-		returnValues.add( o1 );
-		
-		List<Object> o2 = new ArrayList<Object>();
-		Object o22 = new Object();
-		o2.add( o22 );
-		returnValues.add( o2 );
-		
-		List<Object> proceededReturnValue = new ArrayList<Object>();
-		
-		HashSet<Object> result = ( HashSet<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, proceededReturnValue );
-		
-		assertEquals( result.size(), 2 );
-		assertTrue( result.contains( o11 ) );
-		assertTrue( result.contains( o22 ) );
-	}
-    
-    @Test
-	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_2PopulatedListReturnValue_null_PoulatedProceededListReturnValue(){
-    	List<Object> returnValues = new ArrayList<Object>();
-		
-		List<Object> o1 = new ArrayList<Object>();
-		Object o11 = new Object();
-		o1.add( o11 );
-		returnValues.add( o1 );
-		
-		List<Object> o2 = new ArrayList<Object>();
-		Object o22 = new Object();
-		o2.add( o22 );
-		returnValues.add( o2 );
-		
-		returnValues.add(null);
-		
-		List<Object> proceededReturnValue = new ArrayList<Object>();
-		Object proceededReturnValue1 = new Object();
-		proceededReturnValue.add( proceededReturnValue1 );
-		
-		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues, proceededReturnValue );
-		
-		assertEquals( result.size(), 3 );
-		assertEquals( result.get(0), o11 );
-		assertEquals( result.get(1), o22 );
-		assertEquals( result.get(2), proceededReturnValue1 );
 	}
 }

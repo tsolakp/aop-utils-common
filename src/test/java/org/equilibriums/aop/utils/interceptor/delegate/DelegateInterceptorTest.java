@@ -1,3 +1,16 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.equilibriums.aop.utils.interceptor.delegate;
 
 import java.util.List;
@@ -28,58 +41,7 @@ public class DelegateInterceptorTest {
     	public List<Object> method2(String arg1);
 		
 	}	
-	
-    private static interface EventHandler {
 		
-		public String getName();		
-				
-		public void handleEvent(String event);
-	}
-	
-	@Test
-	public void test(){
-		EventHandler delegate1 = createMock( EventHandler.class );
-		EventHandler delegate2 = createMock( EventHandler.class );
-						    
-		DelegateInterceptor delegateInterceptor = new DelegateInterceptor();
-		delegateInterceptor.setDelegates( Arrays.<Object>asList( delegate1, delegate2 ) );
-				
-		org.springframework.aop.framework.ProxyFactory factory = new org.springframework.aop.framework.ProxyFactory( 
-	    new Class[]{EventHandler.class} );
-		//use this as placeholder for real target that implements SomeInterface.		
-		factory.setTargetSource( org.springframework.aop.target.EmptyTargetSource.INSTANCE );
-		
-		org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor getNameStubInterceptor = 
-		new org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor();		
-		getNameStubInterceptor.setReturnValue( "Proxy Name" );
-				
-		org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor nullStubInterceptor = 
-		new org.equilibriums.aop.utils.interceptor.stub.StubWithReturnValueInterceptor();		
-		nullStubInterceptor.setReturnValue(null);
-				
-		org.springframework.aop.support.NameMatchMethodPointcut nameMatchMethodPointcut1 = new org.springframework.aop.support.NameMatchMethodPointcut();	
-		nameMatchMethodPointcut1.setMappedName( "getName" );		
-		factory.addAdvisor(  new org.springframework.aop.support.DefaultPointcutAdvisor( nameMatchMethodPointcut1, getNameStubInterceptor ) );
-		
-		org.springframework.aop.support.NameMatchMethodPointcut nameMatchMethodPointcut2 = new org.springframework.aop.support.NameMatchMethodPointcut();	
-		nameMatchMethodPointcut2.setMappedName( "handleEvent" );		
-		factory.addAdvisor(  new org.springframework.aop.support.DefaultPointcutAdvisor( nameMatchMethodPointcut2, delegateInterceptor ) );
-		factory.addAdvisor(  new org.springframework.aop.support.DefaultPointcutAdvisor( nameMatchMethodPointcut2, nullStubInterceptor ) );
-		
-		EventHandler eventHandlerTarget = (EventHandler)factory.getProxy();
-	    
-		delegate1.handleEvent( "event1" );
-		expectLastCall();
-		
-		delegate2.handleEvent( "event1" );
-		expectLastCall();
-		
-	    replay(delegate1);
-	    assertEquals( eventHandlerTarget.getName(), "Proxy Name" );
-	    eventHandlerTarget.handleEvent( "event1" );
-	    verify(delegate1);
-	}
-	
 	@Before
 	public void initialize(){
 		delegateInterceptor = new DelegateInterceptor();
@@ -110,12 +72,10 @@ public class DelegateInterceptorTest {
 		
 		// even though we are calling void method other interceptors down the
 		// chain can still return non null value
-		Object proceededReturnValue = new Object();
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithVoidReturnTypeMethod.class.getMethod( "method1", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		delegate1.method1("a1");
 		expectLastCall();
@@ -124,7 +84,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, methodInvocation );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -135,10 +95,8 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result1 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result1);
@@ -147,7 +105,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, methodInvocation );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -162,11 +120,9 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithVoidReturnTypeMethod.class.getMethod( "method1", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result1 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result1);
@@ -175,7 +131,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, methodInvocation );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -190,11 +146,9 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		delegate1.method1("a1");
 		expectLastCall();
@@ -203,7 +157,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, methodInvocation );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -217,9 +171,7 @@ public class DelegateInterceptorTest {
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		//with error we should not even proceeed
-		//expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
-
+		
 		//with error we should not even call on delegate
 		//delegate1.method1("a1");
 		//expectLastCall();
@@ -240,14 +192,10 @@ public class DelegateInterceptorTest {
 		
 		delegateInterceptor.setDelegates( Arrays.<Object>asList(delegate1, delegate2) );
 		
-		// even though we are calling void method other interceptors down the
-		// chain can still return non null value
-		Object proceededReturnValue = new Object();
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithVoidReturnTypeMethod.class.getMethod( "method1", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		delegate1.method1("a1");
 		expectLastCall();
@@ -259,7 +207,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, delegate2, methodInvocation );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -271,10 +219,8 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result1 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result1);
@@ -286,7 +232,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, delegate2, methodInvocation );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -303,11 +249,9 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		delegate1.method1("a1");
 		expectLastCall();
@@ -319,7 +263,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, delegate2, methodInvocation );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -334,8 +278,6 @@ public class DelegateInterceptorTest {
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		//with error we should not even proceeed
-		//expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result2 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result2);
@@ -358,19 +300,15 @@ public class DelegateInterceptorTest {
 		
 		delegateInterceptor.setDelegates( Arrays.<Object>asList(delegate1) );
 				
-		// even though we are calling void method other interceptors down the
-		// chain can still return non null value
-		Object proceededReturnValue = new Object();
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithVoidReturnTypeMethod.class.getMethod( "method1", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		DelegateReturnValueHandler delegateReturnValueHandler1 = createMock(DelegateReturnValueHandler.class);
 		delegateInterceptor.setDelegateReturnValueHandlers( Arrays.<DelegateReturnValueHandler>asList( delegateReturnValueHandler1 ) );
 		//with void we should not call DelegateReturnValueHandler, so dont do any easymock expect(..)
-		//expect( delegateReturnValueHandler1.supports( Void.TYPE, returnValues, proceededReturnValue ) ).andReturn(true);
+		//expect( delegateReturnValueHandler1.supports( Void.TYPE, returnValues ) ).andReturn(true);
 		
 		delegate1.method1("a1");
 		expectLastCall();
@@ -379,7 +317,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, methodInvocation, delegateReturnValueHandler1 );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -390,10 +328,8 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		DelegateReturnValueHandler delegateReturnValueHandler1 = createMock(DelegateReturnValueHandler.class);
 		DelegateReturnValueHandler delegateReturnValueHandler2 = createMock(DelegateReturnValueHandler.class);
@@ -407,13 +343,13 @@ public class DelegateInterceptorTest {
 		
 		ArrayList<Object> returnValues = new ArrayList<Object>();
 		returnValues.add(result1);		
-		expect( delegateReturnValueHandler1.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(false);
-		expect( delegateReturnValueHandler2.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
+		expect( delegateReturnValueHandler1.supports( List.class, returnValues ) ).andReturn(false);
+		expect( delegateReturnValueHandler2.supports( List.class, returnValues ) ).andReturn(true);
 		//we should not call delegateReturnValueHandler3.supports since delegateReturnValueHandler2.supports returns true
-		//expect( delegateReturnValueHandler3.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
+		//expect( delegateReturnValueHandler3.supports( List.class, returnValues ) ).andReturn(true);
 		
 		Object handledReturnValue = new Object();
-		expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues, proceededReturnValue ) ).andReturn(handledReturnValue);
+		expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues ) ).andReturn(handledReturnValue);
 		
 		replay( delegate1, methodInvocation, delegateReturnValueHandler1, delegateReturnValueHandler2, delegateReturnValueHandler3 );
 		Object result = delegateInterceptor.invoke( methodInvocation );
@@ -434,11 +370,9 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithVoidReturnTypeMethod.class.getMethod( "method1", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result1 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result1);
@@ -452,17 +386,17 @@ public class DelegateInterceptorTest {
 		//with void we should not call DelegateReturnValueHandler, so dont do any easymock expect(..)
 		//ArrayList<Object> returnValues = new ArrayList<Object>();
 		//returnValues.add(result1);		
-		//expect( delegateReturnValueHandler1.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(false);
-		//expect( delegateReturnValueHandler2.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
+		//expect( delegateReturnValueHandler1.supports( List.class, returnValues ) ).andReturn(false);
+		//expect( delegateReturnValueHandler2.supports( List.class, returnValues ) ).andReturn(true);
 		
 		//Object handledReturnValue = new Object();
-		//expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues, proceededReturnValue ) ).andReturn(handledReturnValue);
+		//expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues ) ).andReturn(handledReturnValue);
 		
 		replay( delegate1, methodInvocation, delegateReturnValueHandler1, delegateReturnValueHandler2, delegateReturnValueHandler3 );
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, methodInvocation, delegateReturnValueHandler1, delegateReturnValueHandler2, delegateReturnValueHandler3 );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -477,11 +411,9 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		delegate1.method1("a1");
 		expectLastCall();
@@ -494,13 +426,13 @@ public class DelegateInterceptorTest {
 
 		ArrayList<Object> returnValues = new ArrayList<Object>();
 		returnValues.add(null);	
-	    expect( delegateReturnValueHandler1.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(false);
-		expect( delegateReturnValueHandler2.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
+	    expect( delegateReturnValueHandler1.supports( List.class, returnValues ) ).andReturn(false);
+		expect( delegateReturnValueHandler2.supports( List.class, returnValues ) ).andReturn(true);
 		//we should not call delegateReturnValueHandler3.supports since delegateReturnValueHandler2.supports returns true
 		//expect( delegateReturnValueHandler3.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
 		
 		Object handledReturnValue = new Object();
-		expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues, proceededReturnValue ) ).andReturn(handledReturnValue);
+		expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues ) ).andReturn(handledReturnValue);
 		
 		replay( delegate1, methodInvocation, delegateReturnValueHandler1, delegateReturnValueHandler2, delegateReturnValueHandler3 );
 		Object result = delegateInterceptor.invoke( methodInvocation );
@@ -520,8 +452,6 @@ public class DelegateInterceptorTest {
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		//with error we should not even proceeed
-		//expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 		
 		//with error we should not even call on delegate
 		//delegate1.method1("a1");
@@ -536,11 +466,11 @@ public class DelegateInterceptorTest {
 		//with error we should not even call on DelegateReturnValueHandlers
 		//ArrayList<Object> returnValues = new ArrayList<Object>();
 		//returnValues.add(null);	
-	    //expect( delegateReturnValueHandler1.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(false);
-		//expect( delegateReturnValueHandler2.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
+	    //expect( delegateReturnValueHandler1.supports( List.class, returnValues ) ).andReturn(false);
+		//expect( delegateReturnValueHandler2.supports( List.class, returnValues ) ).andReturn(true);
 		
 		//Object handledReturnValue = new Object();
-		//expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues, proceededReturnValue ) ).andReturn(handledReturnValue);
+		//expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues ) ).andReturn(handledReturnValue);
 		
 		replay( delegate1, methodInvocation );
 		try{ delegateInterceptor.invoke( methodInvocation ); fail(); }
@@ -557,19 +487,15 @@ public class DelegateInterceptorTest {
 		
 		delegateInterceptor.setDelegates( Arrays.<Object>asList(delegate1, delegate2) );
 		
-		// even though we are calling void method other interceptors down the
-		// chain can still return non null value
-		Object proceededReturnValue = new Object();
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithVoidReturnTypeMethod.class.getMethod( "method1", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		DelegateReturnValueHandler delegateReturnValueHandler1 = createMock(DelegateReturnValueHandler.class);
 		delegateInterceptor.setDelegateReturnValueHandlers( Arrays.<DelegateReturnValueHandler>asList( delegateReturnValueHandler1 ) );
 		//with void we should not call DelegateReturnValueHandler, so dont do any easymock expect(..)
-		//expect( delegateReturnValueHandler1.supports( Void.TYPE, returnValues, proceededReturnValue ) ).andReturn(true);
+		//expect( delegateReturnValueHandler1.supports( Void.TYPE, returnValues ) ).andReturn(true);
 		
 		delegate1.method1("a1");
 		expectLastCall();
@@ -581,7 +507,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, delegate2, methodInvocation, delegateReturnValueHandler1 );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}
 	
 	@Test
@@ -593,10 +519,8 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result1 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result1);
@@ -613,13 +537,13 @@ public class DelegateInterceptorTest {
 		delegateInterceptor.setDelegateReturnValueHandlers( Arrays.<DelegateReturnValueHandler>asList( delegateReturnValueHandler1, 
 	    delegateReturnValueHandler2, delegateReturnValueHandler3 ) );
 		
-		expect( delegateReturnValueHandler1.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(false);
-		expect( delegateReturnValueHandler2.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
+		expect( delegateReturnValueHandler1.supports( List.class, returnValues ) ).andReturn(false);
+		expect( delegateReturnValueHandler2.supports( List.class, returnValues ) ).andReturn(true);
 		//we should not call delegateReturnValueHandler3.supports since delegateReturnValueHandler2.supports returns true
-		//expect( delegateReturnValueHandler3.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true)
+		//expect( delegateReturnValueHandler3.supports( List.class, returnValues ) ).andReturn(true)
 		
 		Object handledReturnValue = new Object();
-		expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues, proceededReturnValue ) ).andReturn(handledReturnValue);
+		expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues ) ).andReturn(handledReturnValue);
 		
 		replay( delegate1, delegate2, methodInvocation, delegateReturnValueHandler1, delegateReturnValueHandler2, delegateReturnValueHandler3 );
 		Object result = delegateInterceptor.invoke( methodInvocation );
@@ -643,10 +567,8 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithVoidReturnTypeMethod.class.getMethod( "method1", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result1 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result1);
@@ -674,7 +596,7 @@ public class DelegateInterceptorTest {
 		Object result = delegateInterceptor.invoke( methodInvocation );
 		verify( delegate1, delegate2, methodInvocation, delegateReturnValueHandler1, delegateReturnValueHandler2, delegateReturnValueHandler3 );
 		
-		assertSame( result, proceededReturnValue );
+		assertNull( result );
 	}	
 	
 	@Test
@@ -692,10 +614,8 @@ public class DelegateInterceptorTest {
 		
 		MethodInvocation methodInvocation = createMock( MethodInvocation.class );
 
-		Object proceededReturnValue = new Object();
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result1 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result1);
@@ -712,11 +632,11 @@ public class DelegateInterceptorTest {
 		ArrayList<Object> returnValues = new ArrayList<Object>();
 		returnValues.add(result1);	
 		returnValues.add(null);	
-		expect( delegateReturnValueHandler1.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(false);
-		expect( delegateReturnValueHandler2.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
+		expect( delegateReturnValueHandler1.supports( List.class, returnValues ) ).andReturn(false);
+		expect( delegateReturnValueHandler2.supports( List.class, returnValues ) ).andReturn(true);
 		
 		Object handledReturnValue = new Object();
-		expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues, proceededReturnValue ) ).andReturn(handledReturnValue);
+		expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues ) ).andReturn(handledReturnValue);
 		
 		replay( delegate1, delegate2, methodInvocation, delegateReturnValueHandler1, delegateReturnValueHandler2, delegateReturnValueHandler3 );
 		Object result = delegateInterceptor.invoke( methodInvocation );
@@ -737,8 +657,6 @@ public class DelegateInterceptorTest {
 		//we are using DelegateWithVoidReturnTypeMethod in this case to create wrong method that will be overridden by delegate method
 		expect( methodInvocation.getMethod() ).andReturn( DelegateWithListReturnTypeMethod.class.getMethod( "method2", new Class[] {String.class} ) );
 		expect( methodInvocation.getArguments() ).andReturn( new String[]{"a1"} );
-		//with error we should not even proceeed
-		//expect( methodInvocation.proceed() ).andReturn( proceededReturnValue );
 
 		ArrayList<Object> result2 = new ArrayList<Object>();
 		expect( delegate1.method2("a1") ).andReturn(result2);
@@ -757,11 +675,11 @@ public class DelegateInterceptorTest {
 		//ArrayList<Object> returnValues = new ArrayList<Object>();
 		//returnValues.add(result1);	
 		//returnValues.add(null);	
-		//expect( delegateReturnValueHandler1.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(false);
-		//expect( delegateReturnValueHandler2.supports( List.class, returnValues, proceededReturnValue ) ).andReturn(true);
+		//expect( delegateReturnValueHandler1.supports( List.class, returnValues ) ).andReturn(false);
+		//expect( delegateReturnValueHandler2.supports( List.class, returnValues ) ).andReturn(true);
 		
 		//Object handledReturnValue = new Object();
-		//expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues, proceededReturnValue ) ).andReturn(handledReturnValue);
+		//expect( delegateReturnValueHandler2.getReturnValue( List.class, returnValues  ) ).andReturn(handledReturnValue);
 		
 		replay( delegate1, methodInvocation, delegateReturnValueHandler1, delegateReturnValueHandler2, delegateReturnValueHandler3 );
 		try{ delegateInterceptor.invoke( methodInvocation ); fail(); }

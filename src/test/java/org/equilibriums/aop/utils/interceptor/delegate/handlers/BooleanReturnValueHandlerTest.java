@@ -1,3 +1,16 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.equilibriums.aop.utils.interceptor.delegate.handlers;
 
 import java.util.List;
@@ -17,99 +30,56 @@ public class BooleanReturnValueHandlerTest {
 	
 	@Test
 	public void testSupports_NonBooleanReturnType(){
-		assertFalse( booleanReturnValueHandler.supports( String.class, null, null ) );
+		assertFalse( booleanReturnValueHandler.supports( String.class, null ) );
 	}
 	
 	@Test
 	public void testSupports_BooleanReturnType(){
-		assertTrue( booleanReturnValueHandler.supports( Boolean.class, null, null ) );
+		assertTrue( booleanReturnValueHandler.supports( Boolean.class, null ) );
 	}
 	
 	@Test
 	public void testSupports_BooleanTypeReturnType(){
-		assertTrue( booleanReturnValueHandler.supports( Boolean.TYPE, null, null ) );
+		assertTrue( booleanReturnValueHandler.supports( Boolean.TYPE, null ) );
 	}
 	
 	
 	@Test
-	public void testGetReturnValue_SingleBooleanReturnValue_NullProceededReturnValue_OROperator(){
+	public void testGetReturnValue_SingleBooleanReturnValue_OROperator(){
 		List<Object> returnValues = new ArrayList<Object>();
 		returnValues.add( Boolean.TRUE );
 		
 		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.OR );
-		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues, null ) );
+		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues ) );
 	}
 	
 	@Test
-	public void testGetReturnValue_SingleBooleanReturnValue_NullProceededReturnValue_ANDOperator(){
+	public void testGetReturnValue_SingleBooleanReturnValue_ANDOperator(){
 		List<Object> returnValues = new ArrayList<Object>();
 		returnValues.add( Boolean.TRUE );
 		
 		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.AND );
-		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues, null ) );
+		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues ) );
 	}
 	
 	
 	@Test
-	public void testGetReturnValue_SingleBooleanReturnValue_ProceededReturnValue_OROperator(){
-		List<Object> returnValues = new ArrayList<Object>();
-		returnValues.add( Boolean.TRUE );
-		
-		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.OR );
-		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues, Boolean.TRUE ) );
-	}
-	
-	@Test
-	public void testGetReturnValue_SingleBooleanReturnValue_ProceededReturnValue_ANDOperator(){
-		List<Object> returnValues = new ArrayList<Object>();
-		returnValues.add( Boolean.TRUE );
-		
-		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.AND );
-		assertFalse( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues, Boolean.FALSE ) );
-	}
-	
-	
-	@Test
-	public void testGetReturnValue_2BooleanReturnValue_NullProceededReturnValue_OROperator(){
+	public void testGetReturnValue_2BooleanReturnValue_OROperator(){
 		List<Object> returnValues = new ArrayList<Object>();
 		returnValues.add( Boolean.TRUE );
 		returnValues.add( Boolean.FALSE );
 		
 		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.OR );
-		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues, null ) );
+		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues ) );
 	}
 	
 	@Test
-	public void testGetReturnValue_2BooleanReturnValue_NullProceededReturnValue_ANDOperator(){
+	public void testGetReturnValue_2BooleanReturnValue_ANDOperator(){
 		List<Object> returnValues = new ArrayList<Object>();
 		returnValues.add( Boolean.TRUE );
 		returnValues.add( Boolean.FALSE );
 		
 		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.AND );
-		assertFalse( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues, null ) );
-	}
-	
-	
-	@Test
-	public void testGetReturnValue_2BooleanReturnValue_ProceededReturnValue_OROperator(){
-		List<Object> returnValues = new ArrayList<Object>();
-		returnValues.add( Boolean.TRUE );
-		returnValues.add( Boolean.FALSE );
-		returnValues.add( null );
-		
-		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.OR );
-		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues, Boolean.TRUE ) );
-	}
-	
-	@Test
-	public void testGetReturnValue_2BooleanReturnValue_ProceededReturnValue_ANDOperator(){
-		List<Object> returnValues = new ArrayList<Object>();
-		returnValues.add( Boolean.TRUE );
-		returnValues.add( Boolean.TRUE );
-		returnValues.add( null );
-		
-		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.AND );
-		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues, Boolean.TRUE ) );
-	}
-	
+		assertFalse( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues ) );
+	}	
 }

@@ -1,5 +1,4 @@
-/* Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
- *
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +19,12 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.aopalliance.intercept.MethodInterceptor;
 
 /**
+ * <p>Throws specified exception for the method this interceptor is configured for without calling
+ * target method (wont call invocation.proceed() ).</p>
+ * <p> IllegalArgumentException is thrown when specified exception is not a RuntimeException and is not part of 
+ * method declared checked exceptions or if method has no declared checked exceptions.</p>
+ * 
+ * <p><u>For more on how to use this interceptor see Overview section of this Javadoc.</u></p>
  * 
  * @author Tsolak Petrosian
  * 
