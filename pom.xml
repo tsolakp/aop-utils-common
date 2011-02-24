@@ -5,7 +5,7 @@
     <groupId>org.equilibriums.utils</groupId>
     <artifactId>aop-utils-common</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0.1</version>
+    <version>1.0.0.1-SNAPSHOT</version>
     <name>Common AOP utility classes.</name>
     <description>Useful implementations of MethodInterceptor.</description>
 
@@ -26,9 +26,9 @@
     </parent>
 
     <scm>
-        <connection>scm:git:git://github.com/tsolakp/aop-utils-common.git</connection>
-        <url>scm:git:git://github.com/tsolakp/aop-utils-common.git</url>
-        <developerConnection>scm:git:git://github.com/tsolakp/aop-utils-common.git</developerConnection>
+        <connection>scm:git:git@github.com:tsolakp/aop-utils-common.git</connection>
+        <url>scm:git:git@github.com:tsolakp/aop-utils-common.git</url>
+        <developerConnection>scm:git:git@github.com:tsolakp/aop-utils-common.git</developerConnection>
     </scm>
 
     <properties>
