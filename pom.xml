@@ -35,7 +35,7 @@
     <distributionManagement>
         <site>
             <id>maven-site-ftp</id>
-            <url>ftp://tsolak.com/domains/tsolak.com/public_html/projects/utils/aop-utils-common</url>
+            <url>ftp://tsolak.com/domains/equilibriums.org/public_html/projects/utils/aop-utils-common</url>
         </site>
     </distributionManagement>
 
