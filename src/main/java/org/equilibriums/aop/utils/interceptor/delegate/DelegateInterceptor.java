@@ -14,111 +14,79 @@
 package org.equilibriums.aop.utils.interceptor.delegate;
 
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 
-import java.lang.reflect.Method;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 
-import org.aopalliance.intercept.MethodInvocation;
 import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 
 /**
- * <p>Will delegate method calls this interceptor is configured for to specified delegates.</p>
+ * <p>Selects delegate from specified delegate map with a key fetched from method arguments using specified argument index and property path.</p>
  * 
- * <p>You can optionally override delegate's method to be called by specifying delegateMethodMap.</p>
- * 
- * <p>Return value from delegate calls are handled by first {@link DelegateReturnValueHandler} that will return true from its 
- * {@link DelegateReturnValueHandler#supports} method.
- * If no {@link DelegateReturnValueHandler} are specified will return null.</p>
- * 
- * <p>Here are some Design Pattern use cases that can be achieved by this interceptor without declaring any new type.</p> 
- * 
- * 
- * <h5>Delegate Pattern:</h5>
- * <p>
- * <ul>
- * <li>Specify single delegate that has same method this interceptor is configured for.</li>
- * <li>Configure proxy that is going to use this interceptor as described in Overview section of this Javadoc.</li>
- * </ul>
- * </p>
- * 
- * <h5>Composite Pattern:</h5>
- * <p>
- * <ul>
- * <li>Specifiy one or more delegates that have same method this interceptor is configured for.</li>
- * <li>Select appropriate ReturnValueHandler handlers depending on return value of the method you are intercepting. 
- *  For void method you leave the handlers empty .</li>
- * <li>Configure proxy that is going to use this interceptor as described in Overview section of this Javadoc.</li>
- * </ul>
- * </p>
+ * <p>This interceptor uses reflection to lookup delegate key and might introduce performance overhead of about 2 times. 
  * 
  * <p><u>For more on how to use this interceptor see Overview section of this Javadoc.</u></p>
  * 
  * @author Tsolak Petrosian
  */
 public class DelegateInterceptor implements MethodInterceptor {
-
-	private List< Object > delegates = null;
-	private Map< Object, Method > delegateMethodMap = null;
 	
-	private List<DelegateReturnValueHandler> delegateReturnValueHandlers = null;
+	private boolean proceed = false; 
+	
+	private int argumentIndex = 0;
+	private String propertyPath = null;
+	private Map< Object, Object > delegateMap = null;
+	
+	public boolean isProceed() {
+		return proceed;
+	}
 
-	public List< Object > getDelegates() {
-    	return delegates;
-    }
+	public void setProceed(boolean proceed) {
+		this.proceed = proceed;
+	}
 
-	public void setDelegates( List< Object > delegates ) {
-    	this.delegates = delegates;
-    }
+	public int getArgumentIndex() {
+		return argumentIndex;
+	}
 
-	/**
-	 * Map where key is delegate and value is the method to be called
-	 * by this interceptor instead of using invocation.getMethod() method.
-	 * 
-	 * @return
-	 */
-	public Map< Object, Method > getDelegateMethodMap() {
-    	return delegateMethodMap;
-    }
+	public void setArgumentIndex(int argumentIndex) {
+		this.argumentIndex = argumentIndex;
+	}
 
-	public void setDelegateMethodMap( Map< Object, Method > delegateMethodMap ) {
-    	this.delegateMethodMap = delegateMethodMap;
-    }
+	public String getPropertyPath() {
+		return propertyPath;
+	}
 
-	public List< DelegateReturnValueHandler > getDelegateReturnValueHandlers() {
-    	return delegateReturnValueHandlers;
-    }
+	public void setPropertyPath(String propertyPath) {
+		this.propertyPath = propertyPath;
+	}
 
-	public void setDelegateReturnValueHandlers( List< DelegateReturnValueHandler > delegateReturnValueHandlers ) {
-    	this.delegateReturnValueHandlers = delegateReturnValueHandlers;
-    }
+	public Map<Object, Object> getDelegateMap() {
+		return delegateMap;
+	}
+
+	public void setDelegateMap(Map<Object, Object> delegateMap) {
+		this.delegateMap = delegateMap;
+	}
 
 	@Override
-	public Object invoke( MethodInvocation invocation ) throws Throwable {
-		if ( delegates == null || delegates.size() == 0 ) throw new IllegalArgumentException( "delegates property needs to specified and cannot be empty" );
-
-		Method invocationMethod = invocation.getMethod();
-		Object[] invocationMethodArguments = invocation.getArguments();
-			
-		List< Object > returnValues = new ArrayList< Object >();
-		for ( Object delegate : delegates )	returnValues.add( resolveDelegateMethod(invocationMethod, delegate).invoke(
-		delegate, invocationMethodArguments ) );
-				
-		Class<?> returnType = invocationMethod.getReturnType();
-		
-		if ( returnType.equals(Void.TYPE) ) return null;
-		
-		if ( delegateReturnValueHandlers != null ) for (DelegateReturnValueHandler delegateReturnValueHandler:delegateReturnValueHandlers) if ( 
-		delegateReturnValueHandler.supports( returnType, returnValues ) ) return delegateReturnValueHandler.getReturnValue( 
-		returnType, returnValues );
-		
-		return null;
+	public Object invoke(MethodInvocation invocation) throws Throwable {		
+		Object[] arguments = invocation.getArguments();
+		if (arguments.length == 0) return null;		
+		Object key = getArgumentPropertyValue(arguments, argumentIndex, propertyPath);
+		Object delegate = delegateMap.get(key);
+		if (delegate == null) return proceed ? invocation.proceed() : null;
+		return invocation.getMethod().invoke(delegate, arguments);
 	}
 	
-	private Method resolveDelegateMethod(Method invocationMethod, Object delegate){
-		if (delegateMethodMap == null) return invocationMethod;
-		Method delegateMethod = delegateMethodMap.get(delegate);
-		if (delegateMethod == null) return invocationMethod;
-		else return delegateMethod;
-	}
+	private Object getArgumentPropertyValue(Object[] arguments, Integer argumentIndex, String propertyPath){
+		if ( StringUtils.isBlank( propertyPath ) ) return arguments[argumentIndex];
+		
+		Object fromPropertyValue = null;
+		try{ fromPropertyValue = PropertyUtils.getProperty( arguments[argumentIndex], propertyPath ); }
+		catch(Exception e){throw new RuntimeException(e);}		
+		
+		return fromPropertyValue;
+   } 
 }

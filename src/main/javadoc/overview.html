@@ -82,6 +82,12 @@
 <p>Both {@link org.springframework.aop.framework.ProxyFactoryBean} and {@link org.springframework.aop.framework.ProxyFactoryBean} take list of {@link org.aopalliance.intercept.MethodInterceptor}'s
 which can be used for some interesting configurations. For example {@link org.equilibriums.aop.utils.interceptor.convert.ConvertMethodReturnValueInterceptor} can be configured before 
 {@link org.equilibriums.aop.utils.interceptor.delegate.DelegateInterceptor} to do additional return value conversion before returning to the caller.</p>  
+
+<h2>Performance issues.</h2>
+
+<p>Both {@link org.springframework.aop.framework.ProxyFactoryBean} and {@link org.springframework.aop.framework.ProxyFactoryBean} will reuse same looked up
+method before calling the chain of interceptors. This should help to lower performance impact but we still will see from 0.5 to 4 times of performance degradation
+in certain configurations which should be considered when using AOP in highly transactional situations.</p>  
   
 </BODY>
 </HTML>

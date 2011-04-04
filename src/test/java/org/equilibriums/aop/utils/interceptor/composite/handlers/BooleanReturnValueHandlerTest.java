@@ -11,10 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.equilibriums.aop.utils.interceptor.delegate.handlers;
-
-import java.util.List;
-import java.util.ArrayList;
+package org.equilibriums.aop.utils.interceptor.composite.handlers;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -46,8 +43,7 @@ public class BooleanReturnValueHandlerTest {
 	
 	@Test
 	public void testGetReturnValue_SingleBooleanReturnValue_OROperator(){
-		List<Object> returnValues = new ArrayList<Object>();
-		returnValues.add( Boolean.TRUE );
+		Object[] returnValues = new Object[]{ Boolean.TRUE };
 		
 		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.OR );
 		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues ) );
@@ -55,8 +51,7 @@ public class BooleanReturnValueHandlerTest {
 	
 	@Test
 	public void testGetReturnValue_SingleBooleanReturnValue_ANDOperator(){
-		List<Object> returnValues = new ArrayList<Object>();
-		returnValues.add( Boolean.TRUE );
+		Object[] returnValues = new Object[]{ Boolean.TRUE };
 		
 		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.AND );
 		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues ) );
@@ -65,9 +60,7 @@ public class BooleanReturnValueHandlerTest {
 	
 	@Test
 	public void testGetReturnValue_2BooleanReturnValue_OROperator(){
-		List<Object> returnValues = new ArrayList<Object>();
-		returnValues.add( Boolean.TRUE );
-		returnValues.add( Boolean.FALSE );
+		Object[] returnValues = new Object[]{ Boolean.TRUE, Boolean.FALSE };
 		
 		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.OR );
 		assertTrue( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues ) );
@@ -75,9 +68,7 @@ public class BooleanReturnValueHandlerTest {
 	
 	@Test
 	public void testGetReturnValue_2BooleanReturnValue_ANDOperator(){
-		List<Object> returnValues = new ArrayList<Object>();
-		returnValues.add( Boolean.TRUE );
-		returnValues.add( Boolean.FALSE );
+		Object[] returnValues = new Object[]{ Boolean.TRUE, Boolean.FALSE };
 		
 		booleanReturnValueHandler.setBooleanOperator( BooleanReturnValueHandler.BooleanOperator.AND );
 		assertFalse( (Boolean)booleanReturnValueHandler.getReturnValue( Boolean.class, returnValues ) );

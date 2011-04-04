@@ -11,22 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.equilibriums.aop.utils.interceptor.delegate.handlers;
+package org.equilibriums.aop.utils.interceptor.composite.handlers;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.equilibriums.aop.utils.interceptor.delegate.DelegateReturnValueHandler;
+import org.equilibriums.aop.utils.interceptor.composite.ReturnValueHandler;
 
 /**
- * <p>Assumes returnType is {@link Object.class}. Will merge all {@link Object} return values from delegates into single {@link Collection} return value.</p>
- * <p>{@link #supports} method will return true only of returnType is {@link Object.class}.</p>
+ * <p>Assumes returnType is of {@link Collection} type. Will merge all {@link Collection} return values from delegates into single {@link Collection} return value.</p>
+ * <p>{@link #supports} method will return true only of returnType is of {@link Collection} sub type.</p>
  * 
  * @author Tsolak Petrosian
  */
-public class ObjectCollectionReturnValueHandler implements DelegateReturnValueHandler {
-
+public class MergeCollectionReturnValueHandler implements ReturnValueHandler {
+	
 	@SuppressWarnings( "rawtypes" )
     private Class< ? extends Collection > collectionClass = null;
 	
@@ -41,15 +40,15 @@ public class ObjectCollectionReturnValueHandler implements DelegateReturnValueHa
     }
 
 	@Override
-	public boolean supports( Class<? extends Object> returnType, List< Object > returnValues ){
-	    return returnType.equals( Object.class );
+	public boolean supports( Class<? extends Object> returnType, Object[] returnValues ){
+	    return Collection.class.isAssignableFrom(returnType);
     }
 	
 	@Override
 	@SuppressWarnings( { "rawtypes", "unchecked" } )
-	public Object getReturnValue( Class<? extends Object> returnType, List< Object > returnValues ){
+	public Object getReturnValue( Class<? extends Object> returnType, Object[] returnValues ){
 		Collection result = collectionClass != null? createInstance(collectionClass) : new ArrayList();
-		for ( Object o:returnValues ) result.add(o);
+		for ( Object o:returnValues ) if (o != null) result.addAll( (Collection)o );
 		return result;
 	}
 	

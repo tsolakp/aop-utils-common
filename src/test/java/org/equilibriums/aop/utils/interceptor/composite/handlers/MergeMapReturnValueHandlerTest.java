@@ -11,17 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.equilibriums.aop.utils.interceptor.delegate.handlers;
+package org.equilibriums.aop.utils.interceptor.composite.handlers;
 
 import java.util.Map;
-import java.util.List;
 import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.junit.*;
-
 import static org.junit.Assert.*;
 
 public class MergeMapReturnValueHandlerTest {
@@ -55,11 +52,10 @@ public class MergeMapReturnValueHandlerTest {
 	
     @Test
 	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_SingleEmptyMapReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
-		
+	public void testGetReturnValue_SingleEmptyMapReturnValue(){		
 		HashMap<Object, Object> o1 = new HashMap<Object, Object>();
-		returnValues.add( o1 );
+		
+		Object[] returnValues = new Object[]{ o1 };
 		
 		HashMap<Object, Object> result = ( HashMap<Object, Object> )mergeMapReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
@@ -71,13 +67,12 @@ public class MergeMapReturnValueHandlerTest {
 	@SuppressWarnings( "unchecked" )
 	public void testGetReturnValue_SinglePopulatedMapReturnValue(){
     	mergeMapReturnValueHandler.setMapClass( TreeMap.class );
-    	
-		List<Object> returnValues = new ArrayList<Object>();
-		
+    			
 		HashMap<Object, Object> o1 = new HashMap<Object, Object>();
 		Object o11 = new Object();
 		o1.put( "o11", o11 );
-		returnValues.add( o1 );
+		
+		Object[] returnValues = new Object[]{ o1 };
 		
 		TreeMap<Object, Object> result = ( TreeMap<Object, Object> )mergeMapReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
@@ -89,13 +84,12 @@ public class MergeMapReturnValueHandlerTest {
     @Test
 	@SuppressWarnings( "unchecked" )
 	public void testGetReturnValue_2EmptyMapReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
 		
 		HashMap<Object, Object> o1 = new HashMap<Object, Object>();
-		returnValues.add( o1 );
 		
 		HashMap<Object, Object> o2 = new HashMap<Object, Object>();
-		returnValues.add( o2 );
+		
+		Object[] returnValues = new Object[]{ o1, o2 };
 		
 		HashMap<Object, Object> result = ( HashMap<Object, Object> )mergeMapReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
@@ -105,20 +99,17 @@ public class MergeMapReturnValueHandlerTest {
     @Test
 	@SuppressWarnings( "unchecked" )
 	public void testGetReturnValue_2PopulatedMapReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
-		
 		HashMap<Object, Object> o1 = new HashMap<Object, Object>();
 		Object o11 = new Object();
 		o1.put( "o11", o11 );
-		returnValues.add( o1 );
 		
 		HashMap<Object, Object> o2 = new HashMap<Object, Object>();
 		Object o22 = new Object();
 		o2.put( "o22", o22 );
-		returnValues.add( o2 );
 		
 		HashMap<Object, Object> o3 = new HashMap<Object, Object>();
-		returnValues.add( o3 );
+		
+		Object[] returnValues = new Object[]{ o1, o2, o3 };
 		
 		HashMap<Object, Object> result = ( HashMap<Object, Object> )mergeMapReturnValueHandler.getReturnValue( Object.class, returnValues );
 		

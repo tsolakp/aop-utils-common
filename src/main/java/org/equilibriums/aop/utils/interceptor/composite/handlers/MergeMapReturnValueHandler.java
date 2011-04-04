@@ -11,13 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.equilibriums.aop.utils.interceptor.delegate.handlers;
+package org.equilibriums.aop.utils.interceptor.composite.handlers;
 
 import java.util.Map;
-import java.util.List;
 import java.util.HashMap;
 
-import org.equilibriums.aop.utils.interceptor.delegate.DelegateReturnValueHandler;
+import org.equilibriums.aop.utils.interceptor.composite.ReturnValueHandler;
 
 /**
  * <p>Assumes returnType is of {@link Map} type. Will merge all {@link Map} return values from delegates into single {@link Map} return value.</p>
@@ -25,7 +24,7 @@ import org.equilibriums.aop.utils.interceptor.delegate.DelegateReturnValueHandle
  * 
  * @author Tsolak Petrosian
  */
-public class MergeMapReturnValueHandler implements DelegateReturnValueHandler {
+public class MergeMapReturnValueHandler implements ReturnValueHandler {
 	
 	@SuppressWarnings( "rawtypes" )	
     private Class< ? extends Map > mapClass = null;
@@ -41,13 +40,13 @@ public class MergeMapReturnValueHandler implements DelegateReturnValueHandler {
     }
 
 	@Override
-	public boolean supports( Class<? extends Object> returnType, List< Object > returnValues ){
+	public boolean supports( Class<? extends Object> returnType, Object[] returnValues ){
 	    return Map.class.isAssignableFrom(returnType);
     }
 	
 	@Override
 	@SuppressWarnings( { "rawtypes", "unchecked" } )
-	public Object getReturnValue( Class<? extends Object> returnType, List< Object > returnValues ){
+	public Object getReturnValue( Class<? extends Object> returnType, Object[] returnValues ){
 		Map result = mapClass != null? createInstance(mapClass) : new HashMap();
 		for ( Object o:returnValues ) if (o != null) result.putAll( (Map)o );
 		return result;

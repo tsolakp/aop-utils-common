@@ -11,9 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.equilibriums.aop.utils.interceptor.delegate;
-
-import java.util.List;
+package org.equilibriums.aop.utils.interceptor.composite;
 
 /**
  * <p>Strategy interface to be implemented to do custom handling of return values from calls to delegates.</p>
@@ -21,16 +19,16 @@ import java.util.List;
  * 
  * @author Tsolak Petrosian
  */
-public interface DelegateReturnValueHandler {
+public interface ReturnValueHandler {
 
 	/**
-	 * Called by {@link DelegateInterceptor} after all delegates are invoked with their retun values.
+	 * Called by {@link CompositeDelegateInterceptor} after all delegates are invoked with their retun values.
 	 * 
 	 * @param returnType
 	 * @param returnValues
 	 * @return If true than {@link getReturnValue} will be called with same returnType and returnValues.
 	 */
-	public boolean supports( Class<? extends Object> returnType, List< Object > returnValues );
+	public boolean supports( Class<? extends Object> returnType, Object[] returnValues );
 	
-	public Object getReturnValue( Class<? extends Object> returnType, List< Object > returnValues );
+	public Object getReturnValue( Class<? extends Object> returnType, Object[] returnValues );
 }

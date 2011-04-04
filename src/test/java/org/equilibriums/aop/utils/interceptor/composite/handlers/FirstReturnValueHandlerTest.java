@@ -11,10 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.equilibriums.aop.utils.interceptor.delegate.handlers;
-
-import java.util.List;
-import java.util.ArrayList;
+package org.equilibriums.aop.utils.interceptor.composite.handlers;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -34,20 +31,17 @@ public class FirstReturnValueHandlerTest {
 	}
 	
 	@Test
-	public void testGetReturnValue_SingleReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
+	public void testGetReturnValue_SingleReturnValue(){		
 		Object o = new Object();
-		returnValues.add( o );
+		Object[] returnValues = new Object[]{ o };
 		
 		assertSame( firstReturnValueHandler.getReturnValue( Object.class, returnValues ), o );
 	}
 		
 	@Test
-	public void testGetReturnValue_2ReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
+	public void testGetReturnValue_2ReturnValue(){		
 		Object o = new Object();
-		returnValues.add( o );
-		returnValues.add( new Object() );
+		Object[] returnValues = new Object[]{ o, new Object() };
 		
 		assertSame( firstReturnValueHandler.getReturnValue( Object.class, returnValues ), o );
 	}	

@@ -11,11 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.equilibriums.aop.utils.interceptor.delegate.handlers;
+package org.equilibriums.aop.utils.interceptor.composite.handlers;
 
-import java.util.List;
-
-import org.equilibriums.aop.utils.interceptor.delegate.DelegateReturnValueHandler;
+import org.equilibriums.aop.utils.interceptor.composite.ReturnValueHandler;
 
 /**
  * <p>Simply retuns first element from returnValues.</p>
@@ -23,15 +21,15 @@ import org.equilibriums.aop.utils.interceptor.delegate.DelegateReturnValueHandle
  * 
  * @author Tsolak Petrosian
  */
-public class FirstReturnValueHandler implements DelegateReturnValueHandler {
+public class FirstReturnValueHandler implements ReturnValueHandler {
 
 	@Override
-	public boolean supports( Class<? extends Object> returnType, List< Object > returnValues ){
+	public boolean supports( Class<? extends Object> returnType, Object[] returnValues ){
 		return true;
 	}
 	
 	@Override
-	public Object getReturnValue( Class<? extends Object> returnType, List< Object > returnValues ){
-		return returnValues.get(0);
+	public Object getReturnValue( Class<? extends Object> returnType, Object[] returnValues ){
+		return returnValues[0];
 	}
 }

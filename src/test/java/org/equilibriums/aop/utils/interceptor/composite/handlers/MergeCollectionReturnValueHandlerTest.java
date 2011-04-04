@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.equilibriums.aop.utils.interceptor.delegate.handlers;
+package org.equilibriums.aop.utils.interceptor.composite.handlers;
 
 import java.util.Map;
 import java.util.List;
@@ -54,11 +54,9 @@ public class MergeCollectionReturnValueHandlerTest {
 	
     @Test
 	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_SingleEmptyListReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
-		
+	public void testGetReturnValue_SingleEmptyListReturnValue(){		
 		List<Object> o1 = new ArrayList<Object>();
-		returnValues.add( o1 );
+		Object[] returnValues = new Object[]{ o1 };
 		
 		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
@@ -70,13 +68,11 @@ public class MergeCollectionReturnValueHandlerTest {
 	@SuppressWarnings( "unchecked" )
 	public void testGetReturnValue_SinglePopulatedListReturnValue(){
     	mergeCollectionReturnValueHandler.setCollectionClass( HashSet.class );
-    	
-		List<Object> returnValues = new ArrayList<Object>();
 		
 		List<Object> o1 = new ArrayList<Object>();
 		Object o11 = new Object();
 		o1.add( o11 );
-		returnValues.add( o1 );
+		Object[] returnValues = new Object[]{ o1 };
 		
 		HashSet<Object> result = ( HashSet<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
@@ -86,14 +82,10 @@ public class MergeCollectionReturnValueHandlerTest {
     
     @Test
 	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_2EmptyListReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
-		
+	public void testGetReturnValue_2EmptyListReturnValue(){		
 		List<Object> o1 = new ArrayList<Object>();
-		returnValues.add( o1 );
-		
 		List<Object> o2 = new ArrayList<Object>();
-		returnValues.add( o2 );
+		Object[] returnValues = new Object[]{ o1, o2 };
 		
 		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
@@ -103,21 +95,18 @@ public class MergeCollectionReturnValueHandlerTest {
         
     @Test
 	@SuppressWarnings( "unchecked" )
-	public void testGetReturnValue_2PopulatedListReturnValue(){
-		List<Object> returnValues = new ArrayList<Object>();
-		
+	public void testGetReturnValue_2PopulatedListReturnValue(){		
 		List<Object> o1 = new ArrayList<Object>();
 		Object o11 = new Object();
 		o1.add( o11 );
-		returnValues.add( o1 );
 		
 		List<Object> o2 = new ArrayList<Object>();
 		Object o22 = new Object();
 		o2.add( o22 );
-		returnValues.add( o2 );
 		
 		List<Object> o3 = new ArrayList<Object>();
-		returnValues.add( o3 );
+		
+		Object[] returnValues = new Object[]{ o1, o2, o3 };
 		
 		List<Object> result = ( List<Object> )mergeCollectionReturnValueHandler.getReturnValue( Object.class, returnValues );
 		
