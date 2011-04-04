@@ -5,7 +5,7 @@
     <groupId>org.equilibriums.utils</groupId>
     <artifactId>aop-utils-common</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0.2</version>
+    <version>1.0.0.3-SNAPSHOT</version>
     <name>Common AOP utility classes.</name>
     <description>Useful implementations of MethodInterceptor.</description>
 
